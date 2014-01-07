@@ -1,5 +1,7 @@
 package app;
 
+import javax.swing.*;
+import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -7,22 +9,12 @@ import java.sql.Statement;
 
 public class app {
     public static void main(String[] args) {
-        try {
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            String database =
-                    "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=FFS.mdb;";
-            Connection conn = DriverManager.getConnection(database, "", "");
-            Statement stmt = conn.createStatement();
-            stmt.execute("select * from Measurement");
-            ResultSet rs = stmt.getResultSet();
-            while(rs.next()){
-                System.out.println(rs.getString("Data"));
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                MainFrame frame = new MainFrame();
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setVisible(true);
             }
-            stmt.close();
-            conn.close();
-        } catch (Exception err) {
-            System.out.println("ERROR: " + err);
-
-        }
+        });
     }
 }
