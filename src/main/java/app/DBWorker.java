@@ -1,28 +1,68 @@
 package app;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DBWorker {
-    public void writeToDB(String str){
-        try {
-            Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-            String database =
-                    "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=FFS.mdb;";
-            Connection conn = DriverManager.getConnection(database, "", "");
-            Statement stmt = conn.createStatement();
-            stmt.execute("select * from Measurement");
-            ResultSet rs = stmt.getResultSet();
-            while(rs.next()){
-                System.out.println(rs.getString("Data"));
-            }
-            stmt.close();
-            conn.close();
-        } catch (Exception err) {
-            System.out.println("ERROR: " + err);
+    public static PreparedStatement preparedStatement = null;
+    public static Connection connection = null;
 
+    public static Integer insertToDb(String tableName, String column, String value) {
+        try {
+            connection = getConnection();
+            String insertTableSQL = "INSERT INTO " + tableName + " (" + column + ")"
+                    + " VALUES "
+                    + "(?)";
+            preparedStatement = connection.prepareStatement(insertTableSQL);
+
+
+            preparedStatement.setString(1, value);
+            preparedStatement.executeUpdate();
+            String readIdSQL = "select @@IDENTITY from " + tableName;
+            Integer id=null;
+
+            preparedStatement = connection.prepareStatement(readIdSQL);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                id = resultSet.getInt(1);
+            }
+            preparedStatement.close();
+            connection.close();
+            return id;
+        } catch (SQLException err) {
+            System.out.println("ERROR: " + err);
+            return null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
+    }
+
+    public static void updateRecord(String tableName, String column, String value, int id, String pKeyColumn) {
+        String updateRecordSQL = "UPDATE " + tableName + " SET " + column + "=? WHERE " + pKeyColumn + "=?";
+        try {
+            connection = getConnection();
+            preparedStatement = connection.prepareStatement(updateRecordSQL);
+            preparedStatement.setString(1, value);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                preparedStatement.close();
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static Connection getConnection() throws ClassNotFoundException, SQLException {
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        String database =
+                "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=FFS.mdb;";
+        return DriverManager.getConnection(database, "", "");
     }
 }

@@ -14,6 +14,11 @@ public class Importer {
                 ++i;
                 if (i == 4 || i == 5 || i == 9) {
                     //MeasurementGroup
+                    Long recordId=null;
+                    if(i==4){
+                        //insert
+                    }
+                    //update (recordId)
                 } else if (i == 7) {
                     //Researcher
                 } else if (i == 6 || i == 12 || i == 22 || i == 28 || i == 30) {
@@ -45,5 +50,16 @@ public class Importer {
 
     public static boolean isBetween(int x, int lower, int upper) {
         return lower <= x && x <= upper;
+    }
+
+    public static String separator1(String sCurrentLine)
+    {
+        String [] separated = sCurrentLine.split("=");
+        return (separated[1]);
+    }
+    public static String separator0(String sCurrentLine)
+    {
+        String [] separated = sCurrentLine.split("=");
+        return (separated[0]);
     }
 }
