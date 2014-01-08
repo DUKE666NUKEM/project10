@@ -6,10 +6,30 @@ import java.sql.*;
  * Created by Somebody on 7.1.14.
  */
 public class asdf {
-    public static void main(String[] args) {
-//        Integer id = DBWorker.insertToDb("MeasurementGroup", "GroupName", "32/10/66");
-//        System.out.println(id);
-        DBWorker.updateRecord("MeasurementGroup", "DateNow", "08/01/14", 40, "GroupId");
+    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+
+        Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
+        String database =
+                "jdbc:odbc:Driver={Microsoft Access Driver (*.mdb)};DBQ=FFS.mdb;";
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            String findRecordSQL = "SELECT * FROM Measurement";
+            connection = DriverManager.getConnection(database, "", "");
+            preparedStatement = connection.prepareStatement(findRecordSQL);
+            //preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            resultSet.next();
+            if (resultSet.next()) {
+                String lineData = resultSet.getString("Data");
+                System.out.println(lineData);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            preparedStatement.close();
+            connection.close();
+        }
     }
 
     public static void qwer() {
